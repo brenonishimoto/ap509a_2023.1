@@ -19,15 +19,15 @@ void setup() {
 }
 
 void draw() {
-  //line(100, 0, 100, 600);
-  //line(200, 0, 200, 600);
-  //line(300, 0, 300, 600);
+  line(100, 0, 100, 600);
+  line(200, 0, 200, 600);
+  line(300, 0, 300, 600);
   
-  //line(0, 100, 400, 100);
-  //line(0, 200, 400, 200);
-  //line(0, 300, 400, 300);
-  //line(0, 400, 400, 400);
-  //line(0, 500, 400, 500);
+  line(0, 100, 400, 100);
+  line(0, 200, 400, 200);
+  line(0, 300, 400, 300);
+  line(0, 400, 400, 400);
+  line(0, 500, 400, 500);
 }
 
 void drawShapes() {
@@ -62,11 +62,24 @@ void drawShapes() {
   }
 }
 
+void repositionMismatchedShape() {
+  int newLockedX = lockedX;
+  int newLockedY = lockedY;
+  
+  // Encontra uma nova posição aleatória diferente da posição travada
+  while (newLockedX == lockedX && newLockedY == lockedY) {
+    newLockedX = int(random(4));
+    newLockedY = int(random(6));
+  }
+  
+  lockedX = newLockedX;
+  lockedY = newLockedY;
+}
+
 void mouseClicked() {
   if (!generated) {
     shapeType = int(random(3));
-    lockedX = int(random(4));
-    lockedY = int(random(6));
+    repositionMismatchedShape();
     drawShapes();
     generated = true;
   } else {
@@ -74,6 +87,7 @@ void mouseClicked() {
     int clickedY = mouseY / 100;
     if (clickedX == lockedX && clickedY == lockedY) {
       shapeType = (shapeType + 1) % 3;
+      repositionMismatchedShape();
       background(255);
       drawShapes();
     }
