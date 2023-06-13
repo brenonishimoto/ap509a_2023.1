@@ -4,8 +4,8 @@ int shapeType;
 boolean generated = false;
 int lockedX;
 int lockedY;
-color circleColor = #ff0000;
-color squareColor = #00ff00;
+color circleColor = #C0C0C0;
+color squareColor = #4B0082;
 
 int[][] grid = new int[12][6];
 int cellSize = 100;
