@@ -7,8 +7,9 @@ int lockedY;
 color circleColor = #C0C0C0;
 color squareColor = #4B0082;
 
-int[][] grid = new int[12][6];
-int cellSize = 100;
+int[][] grid = new int[14][8];
+boolean[][] blocked = new boolean[14][8];
+int cellSize = 97;
 float shapeSizePercentage = 0.8;
 
 ArrayList<PVector> squarePositions = new ArrayList<PVector>();
@@ -17,9 +18,10 @@ ArrayList<PVector> circlePositions = new ArrayList<PVector>();
 int forma = 1;
 
 void setup() {
-  size(1200, 600);
+  fullScreen();
+  size(1400, 800);
   background(0);
-
+  
   // Gera uma figura no início
   generateShapes();
   drawShapes();
@@ -27,21 +29,20 @@ void setup() {
 }
 
 void generateShapes() {
-  for (int i = 0; i < 12; i++) {
-    for (int j = 0; j < 6; j++) {
+  for (int i = 0; i < 14; i++) {
+    for (int j = 0; j < 8; j++) {
       grid[i][j] = 1; // 1 representa um quadrado
       squarePositions.add(new PVector(i, j));
     }
   }
 
   // Escolhe uma posição aleatória para o círculo original
-  lockedX = int(random(12));
-  lockedY = int(random(6));
+  lockedX = int(random(14));
+  lockedY = int(random(8));
 
   grid[lockedX][lockedY] = 0; // 0 representa um círculo
   circlePositions.add(new PVector(lockedX, lockedY));
 }
-
 
 void drawShapes() {
   for (int i = 0; i < grid.length; i++) {
@@ -77,13 +78,15 @@ void mouseClicked() {
   int gridX = mouseX / cellSize;
   int gridY = mouseY / cellSize;
 
-  if (gridX >= 0 && gridX < 12 && gridY >= 0 && gridY < 6) {
+  if (gridX >= 0 && gridX < 14 && gridY >= 0 && gridY < 8 && !blocked[gridX][gridY]) {
+    blocked[gridX][gridY] = true; // Bloqueia a posição clicada
+    
     if (grid[gridX][gridY] == 0 && forma == 1) {
       // Clique em um círculo - transforma pelo menos um quadrado em círculo
       int numSquaresToConvert = Math.min(int(random(1, 6)), countSquares());
       boolean transformed = false;
-      
-      if (countCircles() == numSquaresToConvert) {
+
+      if (countCircles() <= numSquaresToConvert) {
         numSquaresToConvert = countCircles() - 1;
       }
       if (countCircles() > 1) { // Verifica se restará pelo menos um círculo após a transformação
@@ -120,7 +123,6 @@ void mouseClicked() {
         if (countSquares() == numCirclesToConvert) {
           numCirclesToConvert--;
         }
-        //println(numCirclesToConvert);
         for (int i = 0; i < numCirclesToConvert; i++) {
           if (circlePositions.size() > 1) {
             int randomIndex = int(random(circlePositions.size()));
@@ -135,17 +137,37 @@ void mouseClicked() {
         }
       }
     }
-  }
-  if (forma == 0 && countCircles() == 1){
-    forma = 1;
-  }
-  else if (forma == 1 && countSquares() == 1){
-    forma = 0;
-  }
-  background(0); // Limpa o plano de desenho
-  drawShapes(); // Redesenha as formas após a transformação
-}
+    
+    if (countSquares() == 1) {
+      // Resetar a matriz de bloqueio se restar apenas um quadrado
+      for (int i = 0; i < blocked.length; i++) {
+        for (int j = 0; j < blocked[0].length; j++) {
+          blocked[i][j] = false;
+        }
+      }
+    }
+    
+    if (countCircles() == 1) {
+      // Resetar a matriz de bloqueio se restar apenas um círculo
+      for (int i = 0; i < blocked.length; i++) {
+        for (int j = 0; j < blocked[0].length; j++) {
+          blocked[i][j] = false;
+        }
+      }
+    }
 
+    
+    if (forma == 1 && countSquares() == 1) {
+      forma = 0;
+    }
+    else if (forma == 0 && countCircles() == 1) {
+      forma = 1;
+    }
+    
+    background(0); // Limpa o plano de desenho
+    drawShapes(); // Redesenha as formas após a transformação
+  }
+}
 
 void draw() {
   // Se as formas não foram geradas ou houve alguma transformação, redesenha as formas
